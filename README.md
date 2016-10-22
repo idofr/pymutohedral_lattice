@@ -9,8 +9,9 @@ Description
 -----------
 
 This numpy based version of the permutohedral lattice gaussian filtering is a simple translation of the cpp CPU code provided by the authors.
-Due to the nature of Python is runs slower than the cpp version (ignoring the fact that multiple CUDA implementations are also available out there) and is therefore not recommended for production usage.
-Yet it is rather straight forward to understand and very east to use with other Python scripts. It is thus pretty useful for prototyping and educational purposes. 
+
+Due to the nature of Python it runs slower than the cpp version (ignoring the fact that multiple CUDA implementations are also available out there) and is therefore not recommended for production usage.
+Yet it is rather straight forward to understand and very easy to use with other Python scripts. It is thus pretty useful for prototyping and educational purposes. 
 
 
 Scripts
