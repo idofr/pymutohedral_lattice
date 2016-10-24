@@ -181,10 +181,11 @@ class PermutohedralLattice(object):
             for j in range(self.d1 - i, self.d1):
                 self.canonical[i * self.d1 + j] = i - self.d1
 
+        expected_std = self.d1 * np.sqrt(2 / 3.)
         # Compute parts of the rotation matrix E. (See pg.4-5 of paper.)
         for i in range(d):
             # the diagonal entries for normalization
-            self.scale_factor[i] = 1. / np.sqrt((i + 1) * (i + 2))
+            self.scale_factor[i] = expected_std / np.sqrt((i + 1) * (i + 2))
             """
                 We presume that the user would like to do a Gaussian blur of standard deviation
                 1 in each dimension (or a total variance of d, summed over dimensions.)
@@ -198,7 +199,7 @@ class PermutohedralLattice(object):
 
                 So we need to scale the space by (d+1)sqrt(2/3).
             """
-            self.scale_factor[i] *= self.d1 * np.sqrt(2. / 3)
+            # self.scale_factor[i] *= self.d1 * np.sqrt(2. / 3)
 
     @staticmethod
     def filter(inp, ref, debug=True):
