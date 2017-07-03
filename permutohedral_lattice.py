@@ -372,13 +372,18 @@ class PermutohedralLattice(object):
         """
         neighbour1 = np.zeros((self.d1), dtype='int16')
         neighbour2 = np.zeros((self.d1), dtype='int16')
+        # new_vals = np.zeros((self.vd * self.hash_table.size()), dtype='float32')
         new_vals_idx = 0
         old_vals_idx = 0
         hash_table_base_idx = 0
         key = self.hash_table.get_keys()
+        new_vals = np.zeros((self.vd * self.hash_table.size()), dtype='float64')
+        old_vals = np.copy(self.hash_table.values)
 
-        # For each of d+1 axes,
-        for j in range(self.d1):
+        # For each of d+1 axes, reverse takes care of the gradient computation during the backward pass
+        r = range(self.d, -1, -1) if reverse else range(self.d1)
+        for j in r:
+            # log.info(j)
             # For each vertex in the lattice
             for i in range(self.hash_table.size()):  # blur point i in dimension j
                 neighbour1[:self.d] = key[i * self.d:(i + 1) * self.d] + 1
@@ -406,27 +411,29 @@ class PermutohedralLattice(object):
                 if vm1_idx is None:
                     vm1_val = 0
                 else:
-                    vm1_val = self.hash_table.values[vm1_idx:vm1_idx + self.vd]
+                    vm1_val = old_vals[vm1_idx:vm1_idx + self.vd]
 
                 if vp1_idx is None:
                     vp1_val = 0
                 else:
-                    vp1_val = self.hash_table.values[vp1_idx:vp1_idx + self.vd]
+                    vp1_val = old_vals[vp1_idx:vp1_idx + self.vd]
 
                 # applies the convolution with a 1d kernel [1, 2, 1]
-                self.hash_table.values[new_val_offset:new_val_offset + self.vd] = \
-                    .25 * vm1_val + \
-                    .5 * self.hash_table.values[old_val_offset:old_val_offset + self.vd] + \
-                    .25 * vp1_val
+                # self.hash_table.values[new_val_offset:new_val_offset + self.vd] = \
+                new_vals[new_val_offset:new_val_offset + self.vd] = \
+                    .25 * (vm1_val + vp1_val) + \
+                    .5 * old_vals[old_val_offset:old_val_offset + self.vd]
 
             tmp = new_vals_idx
             new_vals_idx = old_vals_idx
             old_vals_idx = tmp
+
+            tmp = new_vals
+            new_vals = old_vals
+            old_vals = tmp
             # the freshest data is now in oldValue, and newValue is ready to be written over
 
-        if old_vals_idx != hash_table_base_idx:
-            self.hash_table.values[hash_table_base_idx:hash_table_base_idx + self.hash_table.size() * self.vd] = \
-                self.hash_table.values[old_vals_idx:old_vals_idx + self.hash_table.size() * self.vd]
+        self.hash_table.values = old_vals
 
     def begin_slice(self):
         """
