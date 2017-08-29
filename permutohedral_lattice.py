@@ -366,9 +366,14 @@ class PermutohedralLattice(object):
             for j in range(self.vd):
                 col[j] += r['weight'] * base[r['offset'] + j]
 
-    def blur(self):
+    def blur(self, reverse=False):
         """
         Performs a Gaussian blur along each projected axis in the hyperplane
+        
+        Args
+        ----
+        reverse: bool, default False
+           used for backprop (not supported in this version of the code) 
         """
         neighbour1 = np.zeros((self.d1), dtype='int16')
         neighbour2 = np.zeros((self.d1), dtype='int16')
